@@ -1,203 +1,574 @@
 <!doctype html>
 <html lang="fr">
+
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Médiathèque</title>
-<link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="icons/icon-192.png">
-<meta name="theme-color" content="#1B2540">
-<style>
-:root{--ink:#1B2540;--paper:#F2F3F7;--card:#fff;--line:#D9DCE5;--mute:#5E6683;--star:#E0A21B;--ok:#2A7F7A;--cur:#B5532F;
---serif:"Palatino Linotype",Palatino,"Book Antiqua",Georgia,serif;--sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-@media(prefers-color-scheme:dark){:root{--ink:#E9ECF5;--paper:#12182B;--card:#1B2340;--line:#2C365A;--mute:#9AA3C4;--ok:#5CC2BA;--cur:#F08A63}}
-*{box-sizing:border-box}html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.45 var(--sans);padding-bottom:calc(76px + env(safe-area-inset-bottom))}
-:focus-visible{outline:3px solid var(--star);outline-offset:2px}
-header{position:sticky;top:0;z-index:5;background:var(--paper);padding:calc(10px + env(safe-area-inset-top)) 16px 8px;border-bottom:1px solid var(--line)}
-.top{display:flex;align-items:baseline;justify-content:space-between;gap:8px}
-h1{font:700 1.7rem/1.1 var(--serif);margin:0;letter-spacing:-.01em}
-#status{font-size:.8rem;color:var(--mute)}
-button{font:inherit;color:inherit;cursor:pointer}
-.gear{background:none;border:0;font-size:1.3rem;padding:6px}
-input,select,textarea{font:inherit;color:inherit;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:10px 12px;width:100%}
-#q{margin:10px 0 8px}
-.tabs{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:2px solid var(--line)}
-.tabs button{background:none;border:0;padding:10px 4px;font-weight:600;color:var(--mute);border-bottom:3px solid transparent;margin-bottom:-2px}
-.tabs button[aria-selected=true]{color:var(--ink);border-color:var(--ink)}
-.tabs small{font-weight:400;margin-left:4px}
-.chips{display:flex;gap:6px;overflow-x:auto;padding:10px 0 2px;scrollbar-width:none}
-.chip{flex:none;border:1px solid var(--line);background:var(--card);border-radius:99px;padding:5px 12px;font-size:.88rem}
-.chip[aria-pressed=true]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
-main{padding:14px 16px;max-width:1100px;margin:auto}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:18px 14px}
-.card{background:none;border:0;padding:0;text-align:left;display:block}
-.cover{aspect-ratio:2/3;border-radius:3px 8px 8px 3px;overflow:hidden;background:var(--c,#3A4A7A);box-shadow:inset 5px 0 0 rgba(0,0,0,.18),0 2px 6px rgba(20,25,50,.25);display:flex;align-items:flex-end;position:relative}
-.cover img{width:100%;height:100%;object-fit:cover}
-.cover span{font:700 1.05rem/1.15 var(--serif);color:#fff;padding:12px 10px 12px 16px}
-.badge{position:absolute;top:6px;right:6px;font-size:.7rem;font-weight:700;background:var(--cur);color:#fff;border-radius:99px;padding:2px 8px}
-.card h2{font:600 .95rem/1.25 var(--serif);margin:8px 0 1px}
-.card p{margin:0;font-size:.82rem;color:var(--mute)}
-.st{color:var(--star);letter-spacing:1px;font-size:.9rem}
-.empty{text-align:center;color:var(--mute);padding:50px 20px}
-.fab{position:fixed;right:18px;bottom:calc(18px + env(safe-area-inset-bottom));width:58px;height:58px;border-radius:50%;border:0;background:var(--star);color:#1B2540;font-size:2rem;box-shadow:0 4px 14px rgba(0,0,0,.3);z-index:6}
-dialog{border:0;border-radius:16px 16px 0 0;padding:0;width:min(560px,100%);max-height:92dvh;margin:auto auto 0;background:var(--paper);color:var(--ink)}
-dialog::backdrop{background:rgba(10,14,30,.55)}
-@media(min-width:700px){dialog{border-radius:16px;margin:auto}}
-form{padding:18px 16px calc(18px + env(safe-area-inset-bottom));display:grid;gap:12px}
-label{display:grid;gap:4px;font-size:.85rem;color:var(--mute)}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.stars{display:flex;gap:2px}.stars button{background:none;border:0;font-size:2rem;line-height:1;color:var(--line);padding:2px}
-.stars button.on{color:var(--star)}
-.acts{display:flex;gap:8px;justify-content:space-between;margin-top:4px}
-.btn{border:1px solid var(--line);background:var(--card);border-radius:10px;padding:11px 16px;font-weight:600}
-.btn.main{background:var(--ink);color:var(--paper);border-color:var(--ink)}.btn.del{color:#C0392B}
-.found{display:grid;gap:6px}.found button{display:flex;gap:10px;align-items:center;text-align:left;border:1px solid var(--line);background:var(--card);border-radius:8px;padding:6px}
-.found img{width:34px;height:50px;object-fit:cover;border-radius:2px}.found b{display:block;font-size:.9rem}.found small{color:var(--mute)}
-#toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:9px 16px;border-radius:99px;font-size:.88rem;opacity:0;pointer-events:none;transition:opacity .2s;z-index:20}
-#toast.on{opacity:1}
-@media(prefers-reduced-motion:reduce){*{transition:none!important}}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Médiathèque</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png">
+  <meta name="theme-color" content="#1B2540">
+  <style>
+    :root {
+      --ink: #1B2540;
+      --paper: #F2F3F7;
+      --card: #fff;
+      --line: #D9DCE5;
+      --mute: #5E6683;
+      --star: #E0A21B;
+      --ok: #2A7F7A;
+      --cur: #B5532F;
+      --serif: "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+      --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif
+    }
+
+    @media(prefers-color-scheme:dark) {
+      :root {
+        --ink: #E9ECF5;
+        --paper: #12182B;
+        --card: #1B2340;
+        --line: #2C365A;
+        --mute: #9AA3C4;
+        --ok: #5CC2BA;
+        --cur: #F08A63
+      }
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    html {
+      -webkit-text-size-adjust: 100%
+    }
+
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font: 16px/1.45 var(--sans);
+      padding-bottom: calc(76px + env(safe-area-inset-bottom))
+    }
+
+    :focus-visible {
+      outline: 3px solid var(--star);
+      outline-offset: 2px
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      background: var(--paper);
+      padding: calc(10px + env(safe-area-inset-top)) 16px 8px;
+      border-bottom: 1px solid var(--line)
+    }
+
+    .top {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 8px
+    }
+
+    h1 {
+      font: 700 1.7rem/1.1 var(--serif);
+      margin: 0;
+      letter-spacing: -.01em
+    }
+
+    #status {
+      font-size: .8rem;
+      color: var(--mute)
+    }
+
+    button {
+      font: inherit;
+      color: inherit;
+      cursor: pointer
+    }
+
+    .gear {
+      background: none;
+      border: 0;
+      font-size: 1.3rem;
+      padding: 6px
+    }
+
+    input,
+    select,
+    textarea {
+      font: inherit;
+      color: inherit;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px 12px;
+      width: 100%
+    }
+
+    #q {
+      margin: 10px 0 8px
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border-bottom: 2px solid var(--line)
+    }
+
+    .tabs button {
+      background: none;
+      border: 0;
+      padding: 10px 4px;
+      font-weight: 600;
+      color: var(--mute);
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px
+    }
+
+    .tabs button[aria-selected=true] {
+      color: var(--ink);
+      border-color: var(--ink)
+    }
+
+    .tabs small {
+      font-weight: 400;
+      margin-left: 4px
+    }
+
+    .chips {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 10px 0 2px;
+      scrollbar-width: none
+    }
+
+    .chip {
+      flex: none;
+      border: 1px solid var(--line);
+      background: var(--card);
+      border-radius: 99px;
+      padding: 5px 12px;
+      font-size: .88rem
+    }
+
+    .chip[aria-pressed=true] {
+      background: var(--ink);
+      color: var(--paper);
+      border-color: var(--ink)
+    }
+
+    main {
+      padding: 14px 16px;
+      max-width: 1100px;
+      margin: auto
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 18px 14px
+    }
+
+    .card {
+      background: none;
+      border: 0;
+      padding: 0;
+      text-align: left;
+      display: block
+    }
+
+    .cover {
+      aspect-ratio: 2/3;
+      border-radius: 3px 8px 8px 3px;
+      overflow: hidden;
+      background: var(--c, #3A4A7A);
+      box-shadow: inset 5px 0 0 rgba(0, 0, 0, .18), 0 2px 6px rgba(20, 25, 50, .25);
+      display: flex;
+      align-items: flex-end;
+      position: relative
+    }
+
+    .cover img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover
+    }
+
+    .cover span {
+      font: 700 1.05rem/1.15 var(--serif);
+      color: #fff;
+      padding: 12px 10px 12px 16px
+    }
+
+    .badge {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      font-size: .7rem;
+      font-weight: 700;
+      background: var(--cur);
+      color: #fff;
+      border-radius: 99px;
+      padding: 2px 8px
+    }
+
+    .card h2 {
+      font: 600 .95rem/1.25 var(--serif);
+      margin: 8px 0 1px
+    }
+
+    .card p {
+      margin: 0;
+      font-size: .82rem;
+      color: var(--mute)
+    }
+
+    .st {
+      color: var(--star);
+      letter-spacing: 1px;
+      font-size: .9rem
+    }
+
+    .empty {
+      text-align: center;
+      color: var(--mute);
+      padding: 50px 20px
+    }
+
+    .fab {
+      position: fixed;
+      right: 18px;
+      bottom: calc(18px + env(safe-area-inset-bottom));
+      width: 58px;
+      height: 58px;
+      border-radius: 50%;
+      border: 0;
+      background: var(--star);
+      color: #1B2540;
+      font-size: 2rem;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, .3);
+      z-index: 6
+    }
+
+    dialog {
+      border: 0;
+      border-radius: 16px 16px 0 0;
+      padding: 0;
+      width: min(560px, 100%);
+      max-height: 92dvh;
+      margin: auto auto 0;
+      background: var(--paper);
+      color: var(--ink)
+    }
+
+    dialog::backdrop {
+      background: rgba(10, 14, 30, .55)
+    }
+
+    @media(min-width:700px) {
+      dialog {
+        border-radius: 16px;
+        margin: auto
+      }
+    }
+
+    form {
+      padding: 18px 16px calc(18px + env(safe-area-inset-bottom));
+      display: grid;
+      gap: 12px
+    }
+
+    label {
+      display: grid;
+      gap: 4px;
+      font-size: .85rem;
+      color: var(--mute)
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px
+    }
+
+    .stars {
+      display: flex;
+      gap: 2px
+    }
+
+    .stars button {
+      background: none;
+      border: 0;
+      font-size: 2rem;
+      line-height: 1;
+      color: var(--line);
+      padding: 2px
+    }
+
+    .stars button.on {
+      color: var(--star)
+    }
+
+    .acts {
+      display: flex;
+      gap: 8px;
+      justify-content: space-between;
+      margin-top: 4px
+    }
+
+    .btn {
+      border: 1px solid var(--line);
+      background: var(--card);
+      border-radius: 10px;
+      padding: 11px 16px;
+      font-weight: 600
+    }
+
+    .btn.main {
+      background: var(--ink);
+      color: var(--paper);
+      border-color: var(--ink)
+    }
+
+    .btn.del {
+      color: #C0392B
+    }
+
+    .found {
+      display: grid;
+      gap: 6px
+    }
+
+    .found button {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      text-align: left;
+      border: 1px solid var(--line);
+      background: var(--card);
+      border-radius: 8px;
+      padding: 6px
+    }
+
+    .found img {
+      width: 34px;
+      height: 50px;
+      object-fit: cover;
+      border-radius: 2px
+    }
+
+    .found b {
+      display: block;
+      font-size: .9rem
+    }
+
+    .found small {
+      color: var(--mute)
+    }
+
+    #toast {
+      position: fixed;
+      left: 50%;
+      bottom: 90px;
+      transform: translateX(-50%);
+      background: var(--ink);
+      color: var(--paper);
+      padding: 9px 16px;
+      border-radius: 99px;
+      font-size: .88rem;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s;
+      z-index: 20
+    }
+
+    #toast.on {
+      opacity: 1
+    }
+
+    @media(prefers-reduced-motion:reduce) {
+      * {
+        transition: none !important
+      }
+    }
+  </style>
 </head>
+
 <body>
-<header>
-  <div class="top"><h1>Médiathèque</h1><span id="status"></span><button class="gear" id="gear" aria-label="Réglages">⚙️</button></div>
-  <input id="q" type="search" placeholder="Rechercher un titre, un auteur, un genre…" aria-label="Rechercher">
-  <div class="tabs" role="tablist" id="tabs"></div>
-  <div class="chips" id="chips"></div>
-</header>
-<main><div class="grid" id="grid"></div><div class="empty" id="empty" hidden></div></main>
-<button class="fab" id="add" aria-label="Ajouter un média">+</button>
-<div id="toast" role="status"></div>
+  <header>
+    <div class="top">
+      <h1>Médiathèque</h1><span id="status"></span><button class="gear" id="gear" aria-label="Réglages">⚙️</button>
+    </div>
+    <input id="q" type="search" placeholder="Rechercher un titre, un auteur, un genre…" aria-label="Rechercher">
+    <div class="tabs" role="tablist" id="tabs"></div>
+    <div class="chips" id="chips"></div>
+  </header>
+  <main>
+    <div class="grid" id="grid"></div>
+    <div class="empty" id="empty" hidden></div>
+  </main>
+  <button class="fab" id="add" aria-label="Ajouter un média">+</button>
+  <div id="toast" role="status"></div>
 
-<dialog id="sheet"><form id="f" method="dialog">
-  <label>Titre<input name="nom" required autocomplete="off"></label>
-  <div class="row">
-    <label>Type<input name="type" list="types" required></label>
-    <label>Statut<select name="statut"><option>Pas commencé</option><option>En cours</option><option>Terminé</option></select></label>
-  </div>
-  <button type="button" class="btn" id="look">Chercher la fiche (couverture, auteur, résumé)</button>
-  <div class="found" id="found"></div>
-  <div><span style="font-size:.85rem;color:var(--mute)">Ma note</span><div class="stars" id="stars"></div></div>
-  <div class="row"><label>Auteur / réalisateur<input name="auteur"></label><label>Terminé le<input name="termine" type="date"></label></div>
-  <label>Genres (séparés par des virgules)<input name="genre"></label>
-  <label>Mon avis<textarea name="notes" rows="4"></textarea></label>
-  <label>Résumé<textarea name="resume" rows="3"></textarea></label>
-  <label>Lien<input name="lien" type="url" inputmode="url"></label>
-  <label>Image de couverture (URL)<input name="cover" type="url" inputmode="url"></label>
-  <div class="acts"><button type="button" class="btn del" id="del">Supprimer</button><span><button type="button" class="btn" id="cancel">Annuler</button> <button class="btn main">Enregistrer</button></span></div>
-</form><datalist id="types"></datalist></dialog>
+  <dialog id="sheet">
+    <form id="f" method="dialog">
+      <label>Titre<input name="nom" required autocomplete="off"></label>
+      <div class="row">
+        <label>Type<input name="type" list="types" required></label>
+        <label>Statut<select name="statut">
+            <option>Pas commencé</option>
+            <option>En cours</option>
+            <option>Terminé</option>
+          </select></label>
+      </div>
+      <button type="button" class="btn" id="look">Chercher la fiche (couverture, auteur, résumé)</button>
+      <div class="found" id="found"></div>
+      <div><span style="font-size:.85rem;color:var(--mute)">Ma note</span>
+        <div class="stars" id="stars"></div>
+      </div>
+      <div class="row"><label>Auteur / réalisateur<input name="auteur"></label><label>Terminé le<input name="termine"
+            type="date"></label></div>
+      <label>Genres (séparés par des virgules)<input name="genre"></label>
+      <label>Mon avis<textarea name="notes" rows="4"></textarea></label>
+      <label>Résumé<textarea name="resume" rows="3"></textarea></label>
+      <label>Lien<input name="lien" type="url" inputmode="url"></label>
+      <label>Image de couverture (URL)<input name="cover" type="url" inputmode="url"></label>
+      <div class="acts"><button type="button" class="btn del" id="del">Supprimer</button><span><button type="button"
+            class="btn" id="cancel">Annuler</button> <button class="btn main">Enregistrer</button></span></div>
+    </form><datalist id="types"></datalist>
+  </dialog>
 
-<dialog id="cfg"><form method="dialog">
-  <p style="margin:0;color:var(--mute);font-size:.9rem">Sans réglage, tes médias restent sur cet appareil. Renseigne ton script Google pour synchroniser avec Notion.</p>
-  <label>URL de l'application web Apps Script<input id="c-url" type="url" placeholder="https://script.google.com/macros/s/…/exec"></label>
-  <label>Clé d'accès (APP_KEY)<input id="c-key" type="password" autocomplete="off"></label>
-  <label>Clé TMDB (optionnelle, pour films et séries)<input id="c-tmdb" autocomplete="off"></label>
-  <div class="acts"><button type="button" class="btn" id="c-exp">Exporter en JSON</button><span><button type="button" class="btn" id="c-sync">Synchroniser</button> <button class="btn main">Enregistrer</button></span></div>
-</form></dialog>
+  <dialog id="cfg">
+    <form method="dialog">
+      <p style="margin:0;color:var(--mute);font-size:.9rem">Sans réglage, tes médias restent sur cet appareil. Renseigne
+        ton script Google pour synchroniser avec Notion.</p>
+      <label>URL de l'application web Apps Script<input id="c-url" type="url"
+          placeholder="https://script.google.com/macros/s/…/exec"></label>
+      <label>Clé d'accès (APP_KEY)<input id="c-key" type="password" autocomplete="off"></label>
+      <label>Clé TMDB (optionnelle, pour films et séries)<input id="c-tmdb" autocomplete="off"></label>
+      <div class="acts"><button type="button" class="btn" id="c-exp">Exporter en JSON</button><span><button
+            type="button" class="btn" id="c-sync">Synchroniser</button> <button
+            class="btn main">Enregistrer</button></span></div>
+    </form>
+  </dialog>
 
-<script>
-const $=s=>document.querySelector(s), TABS=[['Pas commencé','À découvrir'],['En cours','En cours'],['Terminé','Découverts']];
-const TYPES=['Livre','Film','Série TV','Jeu de société','Article'], COLORS=['#3A4A7A','#7A3A4F','#2F6B57','#8A5A2B','#4B3F7A','#2E5F78'];
-let items=[],tab='Pas commencé',tf='',q='',cur=null,note=0,cfg=JSON.parse(localStorage.getItem('cfg')||'{}');
-// --- stockage local (IndexedDB)
-const idb=new Promise((ok,ko)=>{const r=indexedDB.open('mediatheque',1);r.onupgradeneeded=()=>r.result.createObjectStore('items',{keyPath:'id'});r.onsuccess=()=>ok(r.result);r.onerror=ko});
-const tx=async(m,fn)=>{const d=await idb;return new Promise((ok,ko)=>{const t=d.transaction('items',m),s=t.objectStore('items'),r=fn(s);t.oncomplete=()=>ok(r&&r.result);t.onerror=ko})};
-const put=i=>tx('readwrite',s=>s.put(i)), rm=id=>tx('readwrite',s=>s.delete(id)), load=async()=>{items=await tx('readonly',s=>s.getAll())};
-const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('on'),2200)};
-const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const stars=n=>n?'★'.repeat(n)+'☆'.repeat(5-n):'';
-// --- affichage
-function render(){
-  const live=items.filter(i=>!i.deleted), ql=q.toLowerCase();
-  $('#tabs').innerHTML=TABS.map(([k,l])=>`<button role="tab" data-t="${k}" aria-selected="${k===tab}">${l}<small>${live.filter(i=>i.statut===k).length}</small></button>`).join('');
-  const types=[...new Set([...TYPES,...live.map(i=>i.type)])].filter(t=>live.some(i=>i.type===t));
-  $('#chips').innerHTML=['',...types].map(t=>`<button class="chip" data-f="${esc(t)}" aria-pressed="${t===tf}">${t||'Tout'}</button>`).join('');
-  $('#types').innerHTML=[...new Set([...TYPES,...live.map(i=>i.type)])].map(t=>`<option value="${esc(t)}">`).join('');
-  const list=live.filter(i=>i.statut===tab&&(!tf||i.type===tf)&&(!ql||[i.nom,i.auteur,i.genre.join(' '),i.notes].join(' ').toLowerCase().includes(ql)))
-    .sort((a,b)=>tab==='Terminé'?(b.termine||'').localeCompare(a.termine||'')||b.updated-a.updated:b.updated-a.updated);
-  $('#grid').innerHTML=list.map(i=>`<button class="card" data-id="${i.id}"><div class="cover" style="--c:${COLORS[[...i.nom].reduce((a,c)=>a+c.charCodeAt(0),0)%COLORS.length]}">${i.cover?`<img src="${esc(i.cover)}" alt="" loading="lazy" onerror="this.remove()">`:''}<span>${i.cover?'':esc(i.nom)}</span>${i.dirty?'<i class="badge">●</i>':''}</div><h2>${esc(i.nom)}</h2><p>${esc(i.auteur||i.type)}</p><div class="st">${stars(i.note)}</div></button>`).join('');
-  const e=$('#empty');e.hidden=!!list.length;e.textContent=live.length?'Rien ici pour le moment.':'Ajoute ton premier média avec le bouton +.';
-  const n=live.filter(i=>i.dirty).length;$('#status').textContent=!cfg.url?'Local':!navigator.onLine?'Hors ligne':n?`${n} à envoyer`:'Synchronisé';
-}
-// --- fiche
-function open_(i){
-  cur=i||{id:'l-'+Date.now().toString(36),nom:'',type:tf||'Livre',statut:tab,note:0,auteur:'',termine:'',lien:'',cover:'',genre:[],notes:'',resume:'',notionId:null,new:1};
-  const f=$('#f');for(const k of ['nom','type','statut','auteur','termine','lien','cover','notes','resume'])f[k].value=cur[k]||'';
-  f.genre.value=cur.genre.join(', ');note=cur.note;$('#found').innerHTML='';$('#del').hidden=!!cur.new;drawStars();$('#sheet').showModal();
-}
-function drawStars(){$('#stars').innerHTML=[1,2,3,4,5].map(n=>`<button type="button" data-n="${n}" class="${n<=note?'on':''}" aria-label="${n} sur 5">★</button>`).join('')}
-async function save(e){
-  e.preventDefault();const f=e.target,v=k=>f[k].value.trim();
-  Object.assign(cur,{nom:v('nom'),type:v('type'),statut:f.statut.value,note,auteur:v('auteur'),termine:f.termine.value,lien:v('lien'),cover:v('cover'),
-    genre:v('genre').split(',').map(s=>s.trim()).filter(Boolean),notes:f.notes.value.trim(),resume:f.resume.value.trim(),dirty:1,updated:Date.now()});
-  if(cur.statut==='Terminé'&&!cur.termine)cur.termine=new Date().toISOString().slice(0,10);
-  delete cur.new;await put(cur);$('#sheet').close();tab=cur.statut;await load();render();sync();
-}
-async function del(){
-  if(!confirm('Supprimer « '+cur.nom+' » ?'))return;
-  if(cur.notionId){Object.assign(cur,{deleted:1,dirty:1});await put(cur)}else await rm(cur.id);
-  $('#sheet').close();await load();render();sync();
-}
-// --- recherche de fiche (Google Books / TMDB)
-async function look(){
-  const t=$('#f').type.value,n=$('#f').nom.value.trim(),box=$('#found');if(!n)return toast('Saisis d’abord un titre');box.textContent='Recherche…';
-  try{let r=[];
-    if(t==='Livre'){const j=await(await fetch('https://www.googleapis.com/books/v1/volumes?maxResults=5&langRestrict=fr&q='+encodeURIComponent(n))).json();
-      r=(j.items||[]).map(x=>{const v=x.volumeInfo;return{nom:v.title,auteur:(v.authors||[]).join(', '),cover:(v.imageLinks?.thumbnail||'').replace('http:','https:'),resume:v.description||'',genre:(v.categories||[]).slice(0,2),lien:v.infoLink||''}})}
-    else if((t==='Film'||t==='Série TV')&&cfg.tmdb){const k=t==='Film'?'movie':'tv';
-      const j=await(await fetch(`https://api.themoviedb.org/3/search/${k}?language=fr-FR&api_key=${cfg.tmdb}&query=${encodeURIComponent(n)}`)).json();
-      r=(j.results||[]).slice(0,5).map(x=>({nom:x.title||x.name,auteur:'',cover:x.poster_path?'https://image.tmdb.org/t/p/w342'+x.poster_path:'',resume:x.overview||'',genre:[],lien:`https://www.themoviedb.org/${k}/${x.id}`}))}
-    else{box.textContent=t==='Film'||t==='Série TV'?'Ajoute une clé TMDB dans les réglages pour chercher les films et séries.':'Pas de recherche automatique pour ce type.';return}
-    box.innerHTML=r.length?r.map((x,i)=>`<button type="button" data-k="${i}">${x.cover?`<img src="${esc(x.cover)}" alt="">`:''}<span><b>${esc(x.nom)}</b><small>${esc(x.auteur)}</small></span></button>`).join(''):'Aucun résultat.';
-    box._r=r;
-  }catch(err){box.textContent='Recherche impossible (hors ligne ?).'}
-}
-// --- synchronisation Notion via le proxy
-// Apps Script : requête « simple » (corps texte, aucun en-tête perso) pour éviter le preflight CORS
-const api=(action,data={})=>fetch(cfg.url,{method:'POST',body:JSON.stringify({key:cfg.key,action,...data})}).then(async r=>{const j=await r.json().catch(()=>{throw Error('Réponse invalide : vérifie l’URL et l’accès « Tout le monde »')});if(j&&j.error)throw Error(j.error);return j});
-const pack=({nom,type,statut,note,auteur,termine,lien,cover,genre,notes,resume})=>({nom,type,statut,note,auteur,termine,lien,cover,genre,notes,resume});
-let syncing=false;
-async function sync(manual){
-  if(!cfg.url||!cfg.key||syncing||!navigator.onLine)return;syncing=true;$('#status').textContent='Synchronisation…';
-  try{
-    for(const i of items.filter(x=>x.dirty)){
-      if(i.deleted){if(i.notionId)await api('delete',{id:i.notionId});await rm(i.id);continue}
-      if(i.notionId)await api('update',{id:i.notionId,item:pack(i)});else i.notionId=(await api('create',{item:pack(i)})).notionId;
-      i.dirty=0;await put(i)}
-    await load();const remote=await api('list'),seen=new Set();
-    for(const r of remote){
-      const l=items.find(x=>x.notionId===r.notionId)||items.find(x=>!x.notionId&&!x.dirty&&x.nom.toLowerCase()===r.nom.trim().toLowerCase()&&x.type===r.type);
-      seen.add(r.notionId);if(l&&l.dirty)continue;
-      await put({...(l||{id:'n-'+r.notionId,updated:0}),...r,nom:r.nom.trim(),auteur:r.auteur.trim(),dirty:0,updated:l?.updated||Date.parse(r.termine)||1})}
-    for(const l of items)if(l.notionId&&!l.dirty&&!seen.has(l.notionId))await rm(l.id);
-    if(manual)toast('Synchronisé avec Notion');
-  }catch(e){toast('Sync impossible : '+e.message)}
-  syncing=false;await load();render();
-}
-// --- événements
-document.addEventListener('click',e=>{
-  const b=e.target.closest('button');if(!b)return;
-  if(b.dataset.t){tab=b.dataset.t;render()}else if(b.dataset.f!==undefined&&b.classList.contains('chip')){tf=b.dataset.f;render()}
-  else if(b.dataset.id)open_(items.find(i=>i.id===b.dataset.id));
-  else if(b.dataset.n){note=note===+b.dataset.n?0:+b.dataset.n;drawStars()}
-  else if(b.dataset.k!==undefined){const x=$('#found')._r[b.dataset.k],f=$('#f');
-    for(const k of ['nom','auteur','cover','resume','lien'])if(x[k]&&(k==='nom'||!f[k].value))f[k].value=x[k];
-    if(x.genre.length&&!f.genre.value)f.genre.value=x.genre.join(', ');$('#found').innerHTML=''}
-});
-$('#q').oninput=e=>{q=e.target.value;render()};$('#add').onclick=()=>open_();$('#f').onsubmit=save;$('#del').onclick=del;
-$('#cancel').onclick=()=>$('#sheet').close();$('#look').onclick=look;
-$('#gear').onclick=()=>{$('#c-url').value=cfg.url||'';$('#c-key').value=cfg.key||'';$('#c-tmdb').value=cfg.tmdb||'';$('#cfg').showModal()};
-$('#cfg form').onsubmit=()=>{cfg={url:$('#c-url').value.trim(),key:$('#c-key').value,tmdb:$('#c-tmdb').value.trim()};localStorage.setItem('cfg',JSON.stringify(cfg));render();sync(1)};
-$('#c-sync').onclick=()=>{cfg={url:$('#c-url').value.trim(),key:$('#c-key').value,tmdb:$('#c-tmdb').value.trim()};localStorage.setItem('cfg',JSON.stringify(cfg));$('#cfg').close();sync(1)};
-$('#c-exp').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(items.filter(i=>!i.deleted).map(pack),null,1)],{type:'application/json'}));a.download='mediatheque.json';a.click()};
-addEventListener('online',()=>sync());addEventListener('offline',render);
-(async()=>{
-  await load();
-  if(!items.length&&!localStorage.getItem('seeded')){try{for(const i of await(await fetch('seed.json')).json())await put(i);localStorage.setItem('seeded',1);await load()}catch{}}
-  render();sync();
-  if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js');
-})();
-</script>
+  <script>
+    const $ = s => document.querySelector(s), TABS = [['Pas commencé', 'À découvrir'], ['En cours', 'En cours'], ['Terminé', 'Découverts']];
+    const TYPES = ['Livre', 'Film', 'Série TV', 'Jeu de société', 'Article'], COLORS = ['#3A4A7A', '#7A3A4F', '#2F6B57', '#8A5A2B', '#4B3F7A', '#2E5F78'];
+    let items = [], tab = 'Pas commencé', tf = '', q = '', cur = null, note = 0, cfg = JSON.parse(localStorage.getItem('cfg') || '{}');
+    // --- stockage local (IndexedDB)
+    const idb = new Promise((ok, ko) => { const r = indexedDB.open('mediatheque', 1); r.onupgradeneeded = () => r.result.createObjectStore('items', { keyPath: 'id' }); r.onsuccess = () => ok(r.result); r.onerror = ko });
+    const tx = async (m, fn) => { const d = await idb; return new Promise((ok, ko) => { const t = d.transaction('items', m), s = t.objectStore('items'), r = fn(s); t.oncomplete = () => ok(r && r.result); t.onerror = ko }) };
+    const put = i => tx('readwrite', s => s.put(i)), rm = id => tx('readwrite', s => s.delete(id)), load = async () => { items = await tx('readonly', s => s.getAll()) };
+    const toast = m => { const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('on'), 2200) };
+    const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    const stars = n => n ? '★'.repeat(n) + '☆'.repeat(5 - n) : '';
+    // --- affichage
+    function render() {
+      const live = items.filter(i => !i.deleted), ql = q.toLowerCase();
+      $('#tabs').innerHTML = TABS.map(([k, l]) => `<button role="tab" data-t="${k}" aria-selected="${k === tab}">${l}<small>${live.filter(i => i.statut === k).length}</small></button>`).join('');
+      const types = [...new Set([...TYPES, ...live.map(i => i.type)])].filter(t => live.some(i => i.type === t));
+      $('#chips').innerHTML = ['', ...types].map(t => `<button class="chip" data-f="${esc(t)}" aria-pressed="${t === tf}">${t || 'Tout'}</button>`).join('');
+      $('#types').innerHTML = [...new Set([...TYPES, ...live.map(i => i.type)])].map(t => `<option value="${esc(t)}">`).join('');
+      const list = live.filter(i => i.statut === tab && (!tf || i.type === tf) && (!ql || [i.nom, i.auteur, i.genre.join(' '), i.notes].join(' ').toLowerCase().includes(ql)))
+        .sort((a, b) => tab === 'Terminé' ? (b.termine || '').localeCompare(a.termine || '') || b.updated - a.updated : b.updated - a.updated);
+      $('#grid').innerHTML = list.map(i => `<button class="card" data-id="${i.id}"><div class="cover" style="--c:${COLORS[[...i.nom].reduce((a, c) => a + c.charCodeAt(0), 0) % COLORS.length]}">${i.cover ? `<img src="${esc(i.cover)}" alt="" loading="lazy" onerror="this.remove()">` : ''}<span>${i.cover ? '' : esc(i.nom)}</span>${i.dirty ? '<i class="badge">●</i>' : ''}</div><h2>${esc(i.nom)}</h2><p>${esc(i.auteur || i.type)}</p><div class="st">${stars(i.note)}</div></button>`).join('');
+      const e = $('#empty'); e.hidden = !!list.length; e.textContent = live.length ? 'Rien ici pour le moment.' : 'Ajoute ton premier média avec le bouton +.';
+      const n = live.filter(i => i.dirty).length; $('#status').textContent = !cfg.url ? 'Local' : !navigator.onLine ? 'Hors ligne' : n ? `${n} à envoyer` : 'Synchronisé';
+    }
+    // --- fiche
+    function open_(i) {
+      cur = i || { id: 'l-' + Date.now().toString(36), nom: '', type: tf || 'Livre', statut: tab, note: 0, auteur: '', termine: '', lien: '', cover: '', genre: [], notes: '', resume: '', notionId: null, new: 1 };
+      const f = $('#f'); for (const k of ['nom', 'type', 'statut', 'auteur', 'termine', 'lien', 'cover', 'notes', 'resume']) f[k].value = cur[k] || '';
+      f.genre.value = cur.genre.join(', '); note = cur.note; $('#found').innerHTML = ''; $('#del').hidden = !!cur.new; drawStars(); $('#sheet').showModal();
+    }
+    function drawStars() { $('#stars').innerHTML = [1, 2, 3, 4, 5].map(n => `<button type="button" data-n="${n}" class="${n <= note ? 'on' : ''}" aria-label="${n} sur 5">★</button>`).join('') }
+    async function save(e) {
+      e.preventDefault(); const f = e.target, v = k => f[k].value.trim();
+      Object.assign(cur, {
+        nom: v('nom'), type: v('type'), statut: f.statut.value, note, auteur: v('auteur'), termine: f.termine.value, lien: v('lien'), cover: v('cover'),
+        genre: v('genre').split(',').map(s => s.trim()).filter(Boolean), notes: f.notes.value.trim(), resume: f.resume.value.trim(), dirty: 1, updated: Date.now()
+      });
+      if (cur.statut === 'Terminé' && !cur.termine) cur.termine = new Date().toISOString().slice(0, 10);
+      delete cur.new; await put(cur); $('#sheet').close(); tab = cur.statut; await load(); render(); sync();
+    }
+    async function del() {
+      if (!confirm('Supprimer « ' + cur.nom + ' » ?')) return;
+      if (cur.notionId) { Object.assign(cur, { deleted: 1, dirty: 1 }); await put(cur) } else await rm(cur.id);
+      $('#sheet').close(); await load(); render(); sync();
+    }
+    // --- recherche de fiche (Google Books / TMDB)
+    async function look() {
+      const t = $('#f').type.value, n = $('#f').nom.value.trim(), box = $('#found'); if (!n) return toast('Saisis d’abord un titre'); box.textContent = 'Recherche…';
+      try {
+        let r = [];
+        if (t === 'Livre') {
+          const j = await (await fetch('https://www.googleapis.com/books/v1/volumes?maxResults=5&langRestrict=fr&q=' + encodeURIComponent(n))).json();
+          r = (j.items || []).map(x => { const v = x.volumeInfo; return { nom: v.title, auteur: (v.authors || []).join(', '), cover: (v.imageLinks?.thumbnail || '').replace('http:', 'https:'), resume: v.description || '', genre: (v.categories || []).slice(0, 2), lien: v.infoLink || '' } })
+        }
+        else if ((t === 'Film' || t === 'Série TV') && cfg.tmdb) {
+          const k = t === 'Film' ? 'movie' : 'tv';
+          const j = await (await fetch(`https://api.themoviedb.org/3/search/${k}?language=fr-FR&api_key=${cfg.tmdb}&query=${encodeURIComponent(n)}`)).json();
+          r = (j.results || []).slice(0, 5).map(x => ({ nom: x.title || x.name, auteur: '', cover: x.poster_path ? 'https://image.tmdb.org/t/p/w342' + x.poster_path : '', resume: x.overview || '', genre: [], lien: `https://www.themoviedb.org/${k}/${x.id}` }))
+        }
+        else { box.textContent = t === 'Film' || t === 'Série TV' ? 'Ajoute une clé TMDB dans les réglages pour chercher les films et séries.' : 'Pas de recherche automatique pour ce type.'; return }
+        box.innerHTML = r.length ? r.map((x, i) => `<button type="button" data-k="${i}">${x.cover ? `<img src="${esc(x.cover)}" alt="">` : ''}<span><b>${esc(x.nom)}</b><small>${esc(x.auteur)}</small></span></button>`).join('') : 'Aucun résultat.';
+        box._r = r;
+      } catch (err) { box.textContent = 'Recherche impossible (hors ligne ?).' }
+    }
+    // --- synchronisation Notion via le proxy
+    // Apps Script : requête « simple » (corps texte, aucun en-tête perso) pour éviter le preflight CORS
+    const api = (action, data = {}) => fetch(cfg.url, { method: 'POST', body: JSON.stringify({ key: cfg.key, action, ...data }) }).then(async r => { const j = await r.json().catch(() => { throw Error('Réponse invalide : vérifie l’URL et l’accès « Tout le monde »') }); if (j && j.error) throw Error(j.error); return j });
+    const pack = ({ nom, type, statut, note, auteur, termine, lien, cover, genre, notes, resume }) => ({ nom, type, statut, note, auteur, termine, lien, cover, genre, notes, resume });
+    let syncing = false;
+    async function sync(manual) {
+      if (!cfg.url || !cfg.key || syncing || !navigator.onLine) return; syncing = true; $('#status').textContent = 'Synchronisation…';
+      try {
+        for (const i of items.filter(x => x.dirty)) {
+          if (i.deleted) { if (i.notionId) await api('delete', { id: i.notionId }); await rm(i.id); continue }
+          if (i.notionId) await api('update', { id: i.notionId, item: pack(i) }); else i.notionId = (await api('create', { item: pack(i) })).notionId;
+          i.dirty = 0; await put(i)
+        }
+        await load(); const remote = await api('list'), seen = new Set();
+        for (const r of remote) {
+          const l = items.find(x => x.notionId === r.notionId) || items.find(x => !x.notionId && !x.dirty && x.nom.toLowerCase() === r.nom.trim().toLowerCase() && x.type === r.type);
+          seen.add(r.notionId); if (l && l.dirty) continue;
+          await put({ ...(l || { id: 'n-' + r.notionId, updated: 0 }), ...r, nom: r.nom.trim(), auteur: r.auteur.trim(), dirty: 0, updated: l?.updated || Date.parse(r.termine) || 1 })
+        }
+        for (const l of items) if (l.notionId && !l.dirty && !seen.has(l.notionId)) await rm(l.id);
+        if (manual) toast('Synchronisé avec Notion');
+      } catch (e) { toast('Sync impossible : ' + e.message) }
+      syncing = false; await load(); render();
+    }
+    // --- événements
+    document.addEventListener('click', e => {
+      const b = e.target.closest('button'); if (!b) return;
+      if (b.dataset.t) { tab = b.dataset.t; render() } else if (b.dataset.f !== undefined && b.classList.contains('chip')) { tf = b.dataset.f; render() }
+      else if (b.dataset.id) open_(items.find(i => i.id === b.dataset.id));
+      else if (b.dataset.n) { note = note === +b.dataset.n ? 0 : +b.dataset.n; drawStars() }
+      else if (b.dataset.k !== undefined) {
+        const x = $('#found')._r[b.dataset.k], f = $('#f');
+        for (const k of ['nom', 'auteur', 'cover', 'resume', 'lien']) if (x[k] && (k === 'nom' || !f[k].value)) f[k].value = x[k];
+        if (x.genre.length && !f.genre.value) f.genre.value = x.genre.join(', '); $('#found').innerHTML = ''
+      }
+    });
+    $('#q').oninput = e => { q = e.target.value; render() }; $('#add').onclick = () => open_(); $('#f').onsubmit = save; $('#del').onclick = del;
+    $('#cancel').onclick = () => $('#sheet').close(); $('#look').onclick = look;
+    $('#gear').onclick = () => { $('#c-url').value = cfg.url || ''; $('#c-key').value = cfg.key || ''; $('#c-tmdb').value = cfg.tmdb || ''; $('#cfg').showModal() };
+    $('#cfg form').onsubmit = () => { cfg = { url: $('#c-url').value.trim(), key: $('#c-key').value, tmdb: $('#c-tmdb').value.trim() }; localStorage.setItem('cfg', JSON.stringify(cfg)); render(); sync(1) };
+    $('#c-sync').onclick = () => { cfg = { url: $('#c-url').value.trim(), key: $('#c-key').value, tmdb: $('#c-tmdb').value.trim() }; localStorage.setItem('cfg', JSON.stringify(cfg)); $('#cfg').close(); sync(1) };
+    $('#c-exp').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(items.filter(i => !i.deleted).map(pack), null, 1)], { type: 'application/json' })); a.download = 'mediatheque.json'; a.click() };
+    addEventListener('online', () => sync()); addEventListener('offline', render);
+    (async () => {
+      await load();
+      if (!items.length && !localStorage.getItem('seeded')) { try { for (const i of await (await fetch('seed.json')).json()) await put(i); localStorage.setItem('seeded', 1); await load() } catch { } }
+      render(); sync();
+      if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
+    })();
+  </script>
 </body>
+
 </html>
