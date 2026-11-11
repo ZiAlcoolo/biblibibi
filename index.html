@@ -506,8 +506,8 @@
       try {
         let r = [];
         if (t === 'Livre') {
-          const j = await (await fetch('https://www.googleapis.com/books/v1/volumes?maxResults=5&langRestrict=fr&q=' + encodeURIComponent(n))).json();
-          r = (j.items || []).map(x => { const v = x.volumeInfo; return { nom: v.title, auteur: (v.authors || []).join(', '), cover: (v.imageLinks?.thumbnail || '').replace('http:', 'https:'), resume: v.description || '', genre: (v.categories || []).slice(0, 2), lien: v.infoLink || '' } })
+          const j = await (await fetch('https://www.googleapis.com/books/v1/volumes?maxResults=20&q=' + encodeURIComponent(n))).json();
+          r = (j.items || []).map(x => { const v = x.volumeInfo; return { nom: v.title, auteur: (v.authors || []).join(', '), cover: (v.imageLinks?.thumbnail || '').replace('http:', 'https:'), resume: v.description || '', genre: (v.categories || []).slice(0, 2), lien: v.infoLink || '', lang: v.language } }).sort((x, y) => (y.lang === 'fr') - (x.lang === 'fr')).slice(0, 6)
         }
         else if ((t === 'Film' || t === 'Série TV') && cfg.tmdb) {
           const k = t === 'Film' ? 'movie' : 'tv';
