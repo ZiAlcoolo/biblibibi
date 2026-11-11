@@ -89,8 +89,8 @@ label{display:grid;gap:4px;font-size:.85rem;color:var(--mute)}
 </form><datalist id="types"></datalist></dialog>
 
 <dialog id="cfg"><form method="dialog">
-  <p style="margin:0;color:var(--mute);font-size:.9rem">Sans réglage, tes médias restent sur cet appareil. Renseigne ton proxy Notion pour synchroniser.</p>
-  <label>URL du proxy Notion<input id="c-url" type="url" placeholder="https://mediatheque.xxx.workers.dev"></label>
+  <p style="margin:0;color:var(--mute);font-size:.9rem">Sans réglage, tes médias restent sur cet appareil. Renseigne ton script Google pour synchroniser avec Notion.</p>
+  <label>URL de l'application web Apps Script<input id="c-url" type="url" placeholder="https://script.google.com/macros/s/…/exec"></label>
   <label>Clé d'accès (APP_KEY)<input id="c-key" type="password" autocomplete="off"></label>
   <label>Clé TMDB (optionnelle, pour films et séries)<input id="c-tmdb" autocomplete="off"></label>
   <div class="acts"><button type="button" class="btn" id="c-exp">Exporter en JSON</button><span><button type="button" class="btn" id="c-sync">Synchroniser</button> <button class="btn main">Enregistrer</button></span></div>
@@ -154,17 +154,18 @@ async function look(){
   }catch(err){box.textContent='Recherche impossible (hors ligne ?).'}
 }
 // --- synchronisation Notion via le proxy
-const api=(p,m='GET',b)=>fetch(cfg.url.replace(/\/$/,'')+p,{method:m,headers:{'X-Key':cfg.key,'Content-Type':'application/json'},body:b&&JSON.stringify(b)}).then(async r=>{const j=await r.json();if(!r.ok)throw Error(j.error||r.status);return j});
+// Apps Script : requête « simple » (corps texte, aucun en-tête perso) pour éviter le preflight CORS
+const api=(action,data={})=>fetch(cfg.url,{method:'POST',body:JSON.stringify({key:cfg.key,action,...data})}).then(async r=>{const j=await r.json().catch(()=>{throw Error('Réponse invalide : vérifie l’URL et l’accès « Tout le monde »')});if(j&&j.error)throw Error(j.error);return j});
 const pack=({nom,type,statut,note,auteur,termine,lien,cover,genre,notes,resume})=>({nom,type,statut,note,auteur,termine,lien,cover,genre,notes,resume});
 let syncing=false;
 async function sync(manual){
   if(!cfg.url||!cfg.key||syncing||!navigator.onLine)return;syncing=true;$('#status').textContent='Synchronisation…';
   try{
     for(const i of items.filter(x=>x.dirty)){
-      if(i.deleted){if(i.notionId)await api('/items/'+i.notionId,'DELETE');await rm(i.id);continue}
-      if(i.notionId)await api('/items/'+i.notionId,'PATCH',pack(i));else i.notionId=(await api('/items','POST',pack(i))).notionId;
+      if(i.deleted){if(i.notionId)await api('delete',{id:i.notionId});await rm(i.id);continue}
+      if(i.notionId)await api('update',{id:i.notionId,item:pack(i)});else i.notionId=(await api('create',{item:pack(i)})).notionId;
       i.dirty=0;await put(i)}
-    await load();const remote=await api('/items'),seen=new Set();
+    await load();const remote=await api('list'),seen=new Set();
     for(const r of remote){
       const l=items.find(x=>x.notionId===r.notionId)||items.find(x=>!x.notionId&&!x.dirty&&x.nom.toLowerCase()===r.nom.trim().toLowerCase()&&x.type===r.type);
       seen.add(r.notionId);if(l&&l.dirty)continue;
