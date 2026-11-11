@@ -314,6 +314,7 @@
 
     .acts {
       display: flex;
+      flex-wrap: wrap;
       gap: 8px;
       justify-content: space-between;
       margin-top: 4px
@@ -448,8 +449,12 @@
       <label>URL de l'application web Apps Script<input id="c-url" type="url"
           placeholder="https://script.google.com/macros/s/…/exec"></label>
       <label>Clé d'accès (APP_KEY)<input id="c-key" type="password" autocomplete="off"></label>
+      <label>Clé Google Books (recommandée, pour les livres)<input id="c-gb" autocomplete="off"></label>
       <label>Clé TMDB (optionnelle, pour films et séries)<input id="c-tmdb" autocomplete="off"></label>
-      <div class="acts"><button type="button" class="btn" id="c-exp">Exporter en JSON</button><span><button
+      <div class="acts"><button type="button" class="btn" id="s-exp">Exporter les réglages</button><button type="button"
+          class="btn" id="s-imp">Importer des réglages</button></div>
+      <input type="file" id="s-file" accept="application/json,.json" hidden>
+      <div class="acts"><button type="button" class="btn" id="c-exp">Exporter les données</button><span><button
             type="button" class="btn" id="c-sync">Synchroniser</button> <button
             class="btn main">Enregistrer</button></span></div>
     </form>
@@ -506,7 +511,8 @@
       try {
         let r = [];
         if (t === 'Livre') {
-          const j = await (await fetch('https://www.googleapis.com/books/v1/volumes?maxResults=20&q=' + encodeURIComponent(n))).json();
+          const j = await (await fetch('https://www.googleapis.com/books/v1/volumes?maxResults=20&q=' + encodeURIComponent(n) + (cfg.gb ? '&key=' + encodeURIComponent(cfg.gb) : ''))).json();
+          if (j.error) throw Error(j.error.status || 'api');
           r = (j.items || []).map(x => { const v = x.volumeInfo; return { nom: v.title, auteur: (v.authors || []).join(', '), cover: (v.imageLinks?.thumbnail || '').replace('http:', 'https:'), resume: v.description || '', genre: (v.categories || []).slice(0, 2), lien: v.infoLink || '', lang: v.language } }).sort((x, y) => (y.lang === 'fr') - (x.lang === 'fr')).slice(0, 6)
         }
         else if ((t === 'Film' || t === 'Série TV') && cfg.tmdb) {
@@ -517,7 +523,7 @@
         else { box.textContent = t === 'Film' || t === 'Série TV' ? 'Ajoute une clé TMDB dans les réglages pour chercher les films et séries.' : 'Pas de recherche automatique pour ce type.'; return }
         box.innerHTML = r.length ? r.map((x, i) => `<button type="button" data-k="${i}">${x.cover ? `<img src="${esc(x.cover)}" alt="">` : ''}<span><b>${esc(x.nom)}</b><small>${esc(x.auteur)}</small></span></button>`).join('') : 'Aucun résultat.';
         box._r = r;
-      } catch (err) { box.textContent = 'Recherche impossible (hors ligne ?).' }
+      } catch (err) { box.textContent = err.message === 'RESOURCE_EXHAUSTED' ? 'Quota Google Books épuisé : ajoute ta propre clé dans les réglages ⚙️.' : err.message === 'INVALID_ARGUMENT' || err.message === 'PERMISSION_DENIED' ? 'Clé Google Books refusée : vérifie-la et ses restrictions.' : 'Recherche impossible (hors ligne ?).' }
     }
     // --- synchronisation Notion via le proxy
     // Apps Script : requête « simple » (corps texte, aucun en-tête perso) pour éviter le preflight CORS
@@ -555,11 +561,26 @@
         if (x.genre.length && !f.genre.value) f.genre.value = x.genre.join(', '); $('#found').innerHTML = ''
       }
     });
+    const formCfg = () => ({ url: $('#c-url').value.trim(), key: $('#c-key').value, tmdb: $('#c-tmdb').value.trim(), gb: $('#c-gb').value.trim() });
+    $('#s-exp').onclick = async () => {
+      const f = new File([JSON.stringify({ app: 'mediatheque', v: 1, ...formCfg() }, null, 1)], 'mediatheque-reglages.json', { type: 'application/json' });
+      if (navigator.canShare && navigator.canShare({ files: [f] })) { try { await navigator.share({ files: [f] }); return } catch (e) { if (e.name === 'AbortError') return } }
+      const a = document.createElement('a'); a.href = URL.createObjectURL(f); a.download = f.name; a.click(); toast('Exporté : le fichier contient tes clés, garde-le privé');
+    };
+    $('#s-imp').onclick = () => $('#s-file').click();
+    $('#s-file').onchange = async e => {
+      const file = e.target.files[0]; e.target.value = ''; if (!file) return;
+      try {
+        const c = JSON.parse(await file.text()); if (c.app !== 'mediatheque') throw 0;
+        $('#c-url').value = c.url || ''; $('#c-key').value = c.key || ''; $('#c-tmdb').value = c.tmdb || ''; $('#c-gb').value = c.gb || '';
+        cfg = formCfg(); localStorage.setItem('cfg', JSON.stringify(cfg)); render(); toast('Réglages importés'); sync(1)
+      } catch { toast('Fichier de réglages invalide') }
+    };
     $('#q').oninput = e => { q = e.target.value; render() }; $('#add').onclick = () => open_(); $('#f').onsubmit = save; $('#del').onclick = del;
     $('#cancel').onclick = () => $('#sheet').close(); $('#look').onclick = look;
-    $('#gear').onclick = () => { $('#c-url').value = cfg.url || ''; $('#c-key').value = cfg.key || ''; $('#c-tmdb').value = cfg.tmdb || ''; $('#cfg').showModal() };
-    $('#cfg form').onsubmit = () => { cfg = { url: $('#c-url').value.trim(), key: $('#c-key').value, tmdb: $('#c-tmdb').value.trim() }; localStorage.setItem('cfg', JSON.stringify(cfg)); render(); sync(1) };
-    $('#c-sync').onclick = () => { cfg = { url: $('#c-url').value.trim(), key: $('#c-key').value, tmdb: $('#c-tmdb').value.trim() }; localStorage.setItem('cfg', JSON.stringify(cfg)); $('#cfg').close(); sync(1) };
+    $('#gear').onclick = () => { $('#c-url').value = cfg.url || ''; $('#c-key').value = cfg.key || ''; $('#c-tmdb').value = cfg.tmdb || ''; $('#c-gb').value = cfg.gb || ''; $('#cfg').showModal() };
+    $('#cfg form').onsubmit = () => { cfg = formCfg(); localStorage.setItem('cfg', JSON.stringify(cfg)); render(); sync(1) };
+    $('#c-sync').onclick = () => { cfg = formCfg(); localStorage.setItem('cfg', JSON.stringify(cfg)); $('#cfg').close(); sync(1) };
     $('#c-exp').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(items.filter(i => !i.deleted).map(pack), null, 1)], { type: 'application/json' })); a.download = 'mediatheque.json'; a.click() };
     addEventListener('online', () => sync()); addEventListener('offline', render);
     (async () => {

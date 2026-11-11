@@ -19,4 +19,7 @@ Dépose le reste du dossier sur Cloudflare Pages, Netlify, Vercel ou GitHub Page
 Propriétés attendues (insensibles aux espaces/majuscules) : Nom, Type, Statut, Note sur 5, Auteur, Terminé le, Lien, Cover, Genre, Notes, Résumé. Les types Notion sont détectés automatiquement.
 
 ## Recherche de fiches
-Livres : Google Books (sans clé). Films/séries : clé TMDB gratuite à coller dans ⚙️.
+Livres : Google Books. Sans clé, le quota partagé est souvent épuisé : crée une clé (console.cloud.google.com → activer « Books API » → Identifiants → Clé API, restreinte à Books API et à l'URL de ta PWA) et colle-la dans ⚙️. Films/séries : clé TMDB gratuite à coller dans ⚙️.
+
+## Nouvel appareil
+⚙️ → « Exporter les réglages » sur l'ancien appareil (le fichier contient tes clés : garde-le privé), puis « Importer des réglages » sur le nouveau. Tes médias se rechargent depuis Notion à la synchronisation.
