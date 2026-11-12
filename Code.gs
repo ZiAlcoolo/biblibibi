@@ -1,5 +1,8 @@
 // Proxy Notion pour la PWA — Google Apps Script (Web App).
-// Propriétés du script (Paramètres du projet → Propriétés du script) : APP_KEY (toujours), NOTION_TOKEN et DATABASE_ID (source Notion seulement)
+// Propriétés du script (Paramètres du projet → Propriétés du script) :
+//   APP_KEY   : clé partagée par les amis (Google Sheet) — à recopier dans CONFIG.APP_KEY de l'app
+//   ADMIN_KEY : ta clé personnelle, réservée à la source Notion
+//   NOTION_TOKEN, DATABASE_ID : source Notion uniquement
 // Source Google Sheet : le lien du Sheet est envoyé par l'app, rien d'autre à configurer.
 const NV = '2022-06-28';
 const FIELDS = { nom: 'Nom', type: 'Type', statut: 'Statut', note: 'Note sur 5', auteur: 'Auteur', termine: 'Terminé le',
@@ -61,8 +64,12 @@ function doPost(e) {
   const out = o => ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON);
   try {
     const req = JSON.parse(e.postData.contents);
-    if (!prop('APP_KEY') || req.key !== prop('APP_KEY')) return out({ error: 'Clé invalide' });
-    if (req.sheet) return out(sheetAction(req));
+    if (req.sheet) {   // Google Sheet : clé partagée (APP_KEY), préremplie dans l'app
+      if (!prop('APP_KEY') || req.key !== prop('APP_KEY')) return out({ error: 'Clé invalide' });
+      return out(sheetAction(req));
+    }
+    // Notion : clé personnelle de l'administrateur (ADMIN_KEY), jamais écrite dans l'app
+    if (!prop('ADMIN_KEY') || req.key !== prop('ADMIN_KEY')) return out({ error: 'Clé admin invalide (propriété ADMIN_KEY du script)' });
     const map = schema(), db = prop('DATABASE_ID');
     switch (req.action) {
       case 'list': {
@@ -80,7 +87,10 @@ function doPost(e) {
 }
 // ---- Mode Google Sheet (aucune configuration Notion nécessaire)
 function sheetCtx(url) {
-  const ss = SpreadsheetApp.openByUrl(url), sh = ss.getSheetByName('Médias') || ss.insertSheet('Médias');
+  let ss;
+  try { ss = SpreadsheetApp.openByUrl(url); }
+  catch (e) { throw new Error("Impossible d'ouvrir le Sheet : vérifie le lien et qu'il est partagé en « Éditeur » avec l'administrateur."); }
+  const sh = ss.getSheetByName('Médias') || ss.insertSheet('Médias');
   const head = sh.getLastColumn() ? sh.getRange(1, 1, 1, sh.getLastColumn()).getValues()[0].map(String) : [];
   Object.keys(FIELDS).map(f => FIELDS[f]).concat('ID').forEach(c => {
     if (head.some(h => norm(h) === norm(c))) return;

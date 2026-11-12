@@ -4,10 +4,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>Médiathèque</title>
+  <title>Biblibibi</title>
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="icon" href="icons/icon-192.png">
-  <meta name="theme-color" content="#1B2540">
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+  <link rel="icon" href="icons/favicon.ico" sizes="any">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <meta name="theme-color" content="#101B2B">
   <style>
     :root {
       --ink: #1B2540;
@@ -111,11 +113,6 @@
       display: flex;
       gap: 8px;
       margin: 10px 0 8px
-    }
-
-    #q {
-      flex: 1;
-      min-width: 0
     }
 
     #sort {
@@ -463,7 +460,7 @@
 
     .kpi b {
       display: block;
-      font: 700 1.7rem/1.1 var(--serif);
+      font: 700 1.7rem/1.1 var(--font-1);
       color: var(--ink)
     }
 
@@ -485,7 +482,7 @@
     }
 
     .panel h3 {
-      font: 700 1rem var(--serif);
+      font: 700 1rem var(--font-1);
       margin: 0 0 10px
     }
 
@@ -566,7 +563,7 @@
     }
 
     .help h2 {
-      font: 700 1.3rem var(--serif);
+      font: 700 1.3rem var(--font-1);
       margin: 0
     }
 
@@ -598,6 +595,104 @@
       word-break: break-all
     }
 
+    .ic {
+      display: block;
+      filter: var(--icf)
+    }
+
+    .ic-fb {
+      font-size: 1.2em;
+      line-height: 1
+    }
+
+    :root {
+      --icf: none
+    }
+
+    @media(prefers-color-scheme:dark) {
+      :root {
+        --icf: invert(1)
+      }
+
+      .chip[aria-pressed=true] {
+        --icf: none
+      }
+    }
+
+    .chip[aria-pressed=true] {
+      --icf: invert(1)
+    }
+
+    .fab {
+      --icf: none
+    }
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px
+    }
+
+    .tabs button {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      font-size: .84rem;
+      padding: 8px 2px
+    }
+
+    .tabs button .ic {
+      opacity: .55
+    }
+
+    .tabs button[aria-selected=true] .ic {
+      opacity: 1
+    }
+
+    .gear,
+    .qm,
+    .fab {
+      display: grid;
+      place-items: center
+    }
+
+    .qm {
+      padding: 0
+    }
+
+    .btn.del {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px
+    }
+
+    .sw {
+      position: relative;
+      flex: 1;
+      min-width: 0
+    }
+
+    .si {
+      position: absolute;
+      left: 11px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none
+    }
+
+    #q {
+      padding-left: 40px
+    }
+
+    .adm-box {
+      display: grid;
+      gap: 12px;
+      border: 1px dashed var(--line);
+      border-radius: 10px;
+      padding: 12px
+    }
+
     @media(prefers-reduced-motion:reduce) {
       * {
         transition: none !important
@@ -609,10 +704,14 @@
 <body>
   <header>
     <div class="top">
-      <h1>Médiathèque</h1><span id="status"></span><button class="gear" id="gear" aria-label="Réglages">⚙️</button>
+      <h1>Biblibibi</h1><span id="status"></span><button class="gear" id="gear" aria-label="Réglages" data-ic="settings"
+        data-s="24" data-fb="⚙️"></button>
     </div>
-    <div class="sr"><input id="q" type="search" placeholder="Rechercher un titre, un auteur, un genre…"
-        aria-label="Rechercher"><select id="sort" aria-label="Trier"></select></div>
+    <div class="sr">
+      <div class="sw"><span class="si" data-ic="search" data-s="20"></span><input id="q" type="search"
+          placeholder="Rechercher un titre, un auteur, un genre…" aria-label="Rechercher"></div><select id="sort"
+        aria-label="Trier"></select>
+    </div>
     <div class="tabs" role="tablist" id="tabs"></div>
     <div class="chips" id="chips"></div>
   </header>
@@ -621,7 +720,7 @@
     <div class="empty" id="empty" hidden></div>
     <div id="stats" hidden></div>
   </main>
-  <button class="fab" id="add" aria-label="Ajouter un média">+</button>
+  <button class="fab" id="add" aria-label="Ajouter un média" data-ic="plus-math" data-s="32" data-fb="+"></button>
   <div id="toast" role="status"></div>
 
   <dialog id="sheet">
@@ -647,28 +746,36 @@
       <label>Résumé<textarea name="resume" rows="3"></textarea></label>
       <label>Lien<input name="lien" type="url" inputmode="url"></label>
       <label>Image de couverture (URL)<input name="cover" type="url" inputmode="url"></label>
-      <div class="acts"><button type="button" class="btn del" id="del">Supprimer</button><span><button type="button"
-            class="btn" id="cancel">Annuler</button> <button class="btn main">Enregistrer</button></span></div>
+      <div class="acts"><button type="button" class="btn del" id="del"><span data-ic="trash"
+            data-s="20"></span>Supprimer</button><span><button type="button" class="btn" id="cancel">Annuler</button>
+          <button class="btn main">Enregistrer</button></span></div>
     </form><datalist id="types"></datalist>
   </dialog>
 
   <dialog id="cfg">
     <form method="dialog">
-      <div class="top"><strong style="font:700 1.2rem var(--serif)">Réglages</strong><button type="button" class="qm"
-          id="help-btn" aria-label="Aide à la configuration">?</button></div>
-      <p style="margin:0;color:var(--mute);font-size:.9rem">Sans réglage, tes médias restent sur cet appareil. Renseigne
-        ton script Google pour synchroniser (Notion ou Google Sheet).</p>
-      <label>Source des données<select id="c-src">
-          <option value="notion">Notion</option>
-          <option value="sheet">Google Sheet</option>
-        </select></label>
-      <label>URL de l'application web Apps Script<input id="c-url" type="url"
-          placeholder="https://script.google.com/macros/s/…/exec"></label>
-      <label>Clé d'accès (APP_KEY)<input id="c-key" type="password" autocomplete="off"></label>
-      <label id="c-sheet-l" hidden>Lien du Google Sheet<input id="c-sheet" type="url"
+      <div class="top"><strong id="cfg-title" style="font:700 1.2rem var(--font-1)">Réglages</strong><button
+          type="button" class="qm" id="help-btn" aria-label="Aide" data-ic="help" data-s="20" data-fb="?"></button>
+      </div>
+      <p style="margin:0;color:var(--mute);font-size:.9rem">Sans lien Google Sheet, tes médias restent uniquement sur
+        cet appareil.</p>
+      <label id="c-sheet-l">Lien de ton Google Sheet<input id="c-sheet" type="url" inputmode="url"
           placeholder="https://docs.google.com/spreadsheets/d/…"></label>
-      <label>Clé Google Books (recommandée, pour les livres)<input id="c-gb" autocomplete="off"></label>
-      <label>Clé TMDB (optionnelle, pour films et séries)<input id="c-tmdb" autocomplete="off"></label>
+      <p id="share-hint" style="margin:0;color:var(--mute);font-size:.85rem">Crée un Google Sheet vide (sheets.new),
+        puis « Partager » → ajoute <b class="sh-mail">l’administrateur de l’app</b> en <b>Éditeur</b>. Colle ensuite ici
+        l’adresse du Sheet. Détails dans l’aide « ? ».</p>
+      <div id="adm" class="adm-box" hidden>
+        <strong>Administrateur</strong>
+        <label>Source des données<select id="c-src">
+            <option value="notion">Notion</option>
+            <option value="sheet">Google Sheet</option>
+          </select></label>
+        <label>URL de l'application web Apps Script<input id="c-url" type="url"
+            placeholder="Préremplie par CONFIG.SCRIPT_URL"></label>
+        <label>Clé admin (ADMIN_KEY, pour Notion)<input id="c-key" type="password" autocomplete="off"></label>
+        <label>Clé Google Books (écrase CONFIG)<input id="c-gb" autocomplete="off"></label>
+        <label>Clé TMDB (écrase CONFIG)<input id="c-tmdb" autocomplete="off"></label>
+      </div>
       <div class="acts"><button type="button" class="btn" id="s-exp">Exporter les réglages</button><button type="button"
           class="btn" id="s-imp">Importer des réglages</button></div>
       <input type="file" id="s-file" accept="application/json,.json" hidden>
@@ -680,123 +787,113 @@
 
   <dialog id="help">
     <div class="help">
-      <h2>Aide à la configuration</h2>
-      <p class="mut">Tout est facultatif : sans réglage, l’app fonctionne seule et garde tes médias sur cet appareil.
-        Pour les sauvegarder et les retrouver sur plusieurs appareils, branche-la à <b>Notion</b> ou à un <b>Google
-          Sheet</b> via un petit script Google (gratuit, à ton nom).</p>
+      <h2>Aide</h2>
+      <p class="mut">Biblibibi garde tes médias sur cet appareil. Avec un Google Sheet, tu les retrouves aussi sur tes
+        autres appareils et tu en as une sauvegarde à toi.</p>
       <details open>
-        <summary>Vue d’ensemble</summary>
+        <summary>Démarrer avec Google Sheet (3 étapes)</summary>
         <ol>
-          <li>Tu crées un script Google (étape 1) : c’est la passerelle entre l’app et tes données.</li>
-          <li>Tu choisis ta source : Notion (2a) ou Google Sheet (2b).</li>
-          <li>Tu remplis les champs de la page Réglages (3), puis « Enregistrer ».</li>
-        </ol>
-      </details>
-      <details>
-        <summary>1 · Créer le script Google (obligatoire)</summary>
-        <ol>
-          <li>Va sur <b>script.google.com</b> → « Nouveau projet ».</li>
-          <li>Supprime le code par défaut et colle le contenu du fichier <code>Code.gs</code> fourni avec l’app.</li>
-          <li>À gauche, ⚙️ « Paramètres du projet » → « Propriétés du script » → « Ajouter une propriété » : nom
-            <code>APP_KEY</code>, valeur = un mot de passe long de ton choix (ta « clé d’accès »). Pour Notion, ajoute
-            aussi <code>NOTION_TOKEN</code> et <code>DATABASE_ID</code> (étape 2a).</li>
-          <li>Retourne dans l’éditeur, choisis la fonction <code>autoriser</code> dans la liste, clique ▶ « Exécuter »,
-            puis « Examiner les autorisations » → ton compte → « Paramètres avancés » → « Accéder à … (non sécurisé) » →
-            « Autoriser ». C’est normal : le script est le tien.</li>
-          <li>« Déployer » → « Nouveau déploiement » → roue ⚙️ → « Application Web ». « Exécuter en tant que » :
-            <b>Moi</b> ; « Qui a accès » : <b>Tout le monde</b> (la clé d’accès protège l’URL). « Déployer ».</li>
-          <li>Copie l’<b>URL de l’application Web</b> (elle finit par <code>/exec</code>) : c’est le champ « URL de
-            l’application web ».</li>
-          <li>Si tu modifies le code plus tard : « Déployer » → « Gérer les déploiements » → ✏️ → Version « Nouvelle
-            version » → « Déployer ». Sans ça, l’ancien code continue de tourner.</li>
-        </ol>
-      </details>
-      <details>
-        <summary>2a · Source Notion</summary>
-        <ol>
-          <li>Va sur <b>notion.so/profile/integrations</b> → « Nouvelle intégration » (type interne) → copie le « Secret
-            d’intégration » : c’est <code>NOTION_TOKEN</code>.</li>
-          <li>Ouvre ta base de données → menu <b>•••</b> en haut à droite → « Connexions » → ajoute ton intégration.
-            Sans ça, Notion répond « introuvable ».</li>
-          <li>Ouvre la base en pleine page : l’adresse ressemble à <code>notion.so/…/32caractères?v=…</code>. Ces 32
-            caractères (avant « ?v= ») sont <code>DATABASE_ID</code>.</li>
-          <li>Ajoute <code>NOTION_TOKEN</code> et <code>DATABASE_ID</code> dans les propriétés du script (étape 1.3).
+          <li>Va sur <b>sheets.new</b> pour créer un Google Sheet vide (donne-lui le nom que tu veux).</li>
+          <li>Clique sur « Partager » et ajoute <b class="sh-mail">l’administrateur de l’app</b> en <b>Éditeur</b>.
+            Alternative : « Accès général » → « Tous les utilisateurs disposant du lien » avec le rôle <b>Éditeur</b>.
           </li>
-          <li>Propriétés attendues (majuscules et espaces ignorés) : Nom (titre), Type, Statut (options « Pas commencé
-            », « En cours », « Terminé »), Note sur 5, Auteur, Terminé le, Lien, Cover, Genre, Notes, Résumé. Facultatif
-            : « Ajouté le » ; sinon la date de création de la page sert au tri.</li>
+          <li>Copie l’adresse du Sheet dans la barre du navigateur, ouvre ⚙️ Réglages, colle-la dans « Lien de ton
+            Google Sheet » et enregistre.</li>
         </ol>
+        <p class="mut">L’app crée toute seule l’onglet « Médias » et ses colonnes. Ne partage ce Sheet qu’avec des
+          personnes de confiance : quiconque a le lien en édition peut modifier ta liste.</p>
       </details>
       <details>
-        <summary>2b · Source Google Sheet</summary>
-        <ol>
-          <li>Crée un Google Sheet vierge (sheets.new) <b>avec le compte qui a déployé le script</b>, ou partage un
-            Sheet existant avec ce compte en « Éditeur ».</li>
-          <li>Copie son adresse complète dans la barre du navigateur : c’est le champ « Lien du Google Sheet ».</li>
-          <li>Au premier envoi, le script crée l’onglet <b>Médias</b> avec les colonnes Nom, Type, Statut, Note sur 5,
-            Auteur, Terminé le, Lien, Cover, Genre, Notes, Résumé, Ajouté le, ID.</li>
-          <li>Tu peux aussi remplir le tableau à la main : les lignes sans ID en reçoivent un à la prochaine
-            synchronisation. Statut = Pas commencé / En cours / Terminé ; note = nombre de 0 à 5 ; genres séparés par
-            des virgules ; dates au format AAAA-MM-JJ.</li>
-          <li>Ne renomme pas les en-têtes, ne touche pas à la colonne ID et n’y mets pas de formules.</li>
-          <li>Aucune propriété Notion n’est nécessaire : seule <code>APP_KEY</code> compte.</li>
-        </ol>
-      </details>
-      <details>
-        <summary>3 · Remplir les champs des réglages</summary>
+        <summary>Remplir ou corriger ton Sheet à la main</summary>
         <ul>
-          <li><b>Source des données</b> : Notion ou Google Sheet.</li>
-          <li><b>URL de l’application web</b> : l’adresse en <code>/exec</code> de l’étape 1.6.</li>
-          <li><b>Clé d’accès (APP_KEY)</b> : exactement le mot de passe saisi dans les propriétés du script.</li>
-          <li><b>Lien du Google Sheet</b> (source Sheet uniquement) : étape 2b.</li>
-          <li><b>Clé Google Books</b> et <b>clé TMDB</b> : facultatives, étape 4.</li>
-        </ul>
-        <p class="mut">Puis « Enregistrer » : la synchronisation démarre. Si tu changes de source plus tard, l’app te
-          demande quoi faire des médias déjà présents.</p>
-      </details>
-      <details>
-        <summary>4 · Clés facultatives (recherche de fiches)</summary>
-        <ol>
-          <li><b>Google Books</b> (livres) : sur console.cloud.google.com, crée un projet → « API et services » → «
-            Bibliothèque » → « Books API » → Activer → « Identifiants » → « Créer des identifiants » → « Clé API ».
-            Restreins-la : API = Books API uniquement ; applications = sites web, avec l’adresse de ton app suivie de
-            <code>/*</code>. Sans clé, le quota partagé est souvent épuisé.</li>
-          <li><b>TMDB</b> (films et séries) : crée un compte gratuit sur themoviedb.org → Paramètres → API → demande une
-            clé (usage personnel) → copie la « Clé d’API » (v3, pas le jeton de lecture).</li>
-        </ol>
-      </details>
-      <details>
-        <summary>5 · Installer l’app et changer d’appareil</summary>
-        <ul>
-          <li><b>Android (Chrome)</b> : menu ⋮ → « Installer l’application ». <b>iPhone (Safari)</b> : Partager → « Sur
-            l’écran d’accueil ». L’app doit être servie en HTTPS.</li>
-          <li><b>Nouvel appareil</b> : « Exporter les réglages » sur l’ancien, puis « Importer des réglages » sur le
-            nouveau. Le fichier contient tes clés : garde-le privé.</li>
-          <li><b>Sauvegarde</b> : « Exporter les données » crée un fichier JSON de tous tes médias.</li>
+          <li>Une ligne = un média. Colonnes : Nom, Type, Statut, Note sur 5, Auteur, Terminé le, Lien, Cover, Genre,
+            Notes, Résumé, Ajouté le, ID.</li>
+          <li>Statut : « Pas commencé », « En cours » ou « Terminé ». Note : un nombre de 0 à 5. Genres séparés par des
+            virgules. Dates au format AAAA-MM-JJ.</li>
+          <li>Les lignes sans ID en reçoivent un à la prochaine synchronisation. Ne touche pas à la colonne ID, ne
+            renomme pas les en-têtes et n’y mets pas de formules.</li>
         </ul>
       </details>
       <details>
-        <summary>6 · Problèmes fréquents</summary>
+        <summary>Changer d’appareil, installer, sauvegarder</summary>
         <ul>
-          <li><b>« Clé invalide »</b> : l’APP_KEY de l’app diffère de celle du script.</li>
-          <li><b>« Réponse invalide… »</b> : l’URL ne finit pas par /exec, l’accès n’est pas « Tout le monde », ou le
-            script n’a jamais été autorisé (1.4).</li>
-          <li><b>Notion « introuvable »</b> : intégration non ajoutée à la base (2a.2) ou mauvais DATABASE_ID.</li>
-          <li><b>Sheet inaccessible</b> : le compte qui a déployé le script n’a pas accès au document.</li>
-          <li><b>Code modifié sans effet</b> : crée une nouvelle version du déploiement (1.7).</li>
-          <li><b>Pastille ● sur une couverture</b> : modifications pas encore envoyées ; elles partent au retour du
+          <li>Sur le nouvel appareil, ouvre l’app et colle le même lien de Sheet dans les réglages : tes médias
+            reviennent.</li>
+          <li>Installer l’app : Chrome Android → ⋮ → « Installer l’application » ; iPhone (Safari) → Partager → « Sur
+            l’écran d’accueil ».</li>
+          <li>« Exporter les données » crée une copie JSON de ta liste sur l’appareil.</li>
+        </ul>
+      </details>
+      <details>
+        <summary>Problèmes fréquents</summary>
+        <ul>
+          <li><b>« Impossible d’ouvrir le Sheet »</b> : le lien est incorrect ou le Sheet n’est pas partagé en Éditeur
+            avec l’administrateur.</li>
+          <li><b>« Clé invalide »</b> ou <b>« Réponse invalide »</b> : l’app n’est pas (ou plus) bien configurée côté
+            administrateur ; préviens-le.</li>
+          <li><b>Pastille ● sur une couverture</b> : modifications en attente d’envoi, elles partent au retour du
             réseau.</li>
-          <li><b>L’app ne se met pas à jour</b> : ferme-la et rouvre-la deux fois (cache hors ligne).</li>
+          <li><b>L’app ne se met pas à jour</b> : ferme-la et rouvre-la deux fois.</li>
         </ul>
+      </details>
+      <details class="adm-only" hidden>
+        <summary>Admin · Mettre en place le script partagé</summary>
+        <ol>
+          <li>script.google.com → « Nouveau projet », colle le contenu de <code>Code.gs</code>.</li>
+          <li>⚙️ « Paramètres du projet » → « Propriétés du script » : <code>APP_KEY</code> (clé partagée par les amis,
+            à copier dans <code>CONFIG</code>), <code>ADMIN_KEY</code> (ta clé personnelle, réservée à Notion) et, pour
+            Notion, <code>NOTION_TOKEN</code> et <code>DATABASE_ID</code>.</li>
+          <li>Exécute la fonction <code>autoriser</code> et accepte les autorisations (« Paramètres avancés » → «
+            Accéder à … »).</li>
+          <li>« Déployer » → « Nouveau déploiement » → « Application Web » : Exécuter en tant que <b>Moi</b>, Accès
+            <b>Tout le monde</b>. Copie l’URL en <code>/exec</code>.</li>
+          <li>Dans <code>index.html</code>, remplis l’objet <code>CONFIG</code> : <code>SCRIPT_URL</code>,
+            <code>APP_KEY</code> (la même que dans le script), <code>SHARE_EMAIL</code> (ton adresse Google) et, si tu
+            veux, <code>GBOOKS_KEY</code> / <code>TMDB_KEY</code>. Puis republie l’app.</li>
+          <li>Après chaque modification de <code>Code.gs</code> : « Déployer » → « Gérer les déploiements » → ✏️ → «
+            Nouvelle version ».</li>
+        </ol>
+      </details>
+      <details class="adm-only" hidden>
+        <summary>Admin · Source Notion (ta base perso)</summary>
+        <ol>
+          <li>notion.so/profile/integrations → nouvelle intégration interne → copie le secret
+            (<code>NOTION_TOKEN</code>).</li>
+          <li>Dans ta base : ••• → « Connexions » → ajoute l’intégration. <code>DATABASE_ID</code> = les 32 caractères
+            de l’adresse avant « ?v= ».</li>
+          <li>Dans Réglages (mode admin) : Source « Notion » et ta <code>ADMIN_KEY</code> dans « Clé admin ». L’URL du
+            script est déjà préremplie.</li>
+          <li>Propriétés attendues : Nom, Type, Statut (Pas commencé / En cours / Terminé), Note sur 5 (sélection ou
+            texte), Auteur, Terminé le, Lien, Cover, Genre, Notes, Résumé. Facultatif : « Ajouté le ».</li>
+        </ol>
+      </details>
+      <details class="adm-only" hidden>
+        <summary>Admin · Clés Google Books et TMDB (partagées)</summary>
+        <ol>
+          <li>Google Books : console.cloud.google.com → projet → « Books API » → Activer → « Identifiants » → « Clé API
+            », restreinte à Books API et à l’adresse de l’app (<code>https://ton-site/*</code>). Colle-la dans
+            <code>CONFIG.GBOOKS_KEY</code>. Le quota (1 000 requêtes par jour) est partagé entre tous les amis.</li>
+          <li>TMDB : themoviedb.org → Paramètres → API → « Clé d’API » (v3) → <code>CONFIG.TMDB_KEY</code>.</li>
+        </ol>
+      </details>
+      <details class="adm-only" hidden>
+        <summary>Admin · Mode administrateur</summary>
+        <p class="mut">Touche cinq fois le titre « Réglages » pour afficher ou masquer les options administrateur
+          (source, clé, clés API). Tes amis ne voient que le lien du Sheet.</p>
       </details>
       <form method="dialog"><button class="btn main">Fermer</button></form>
     </div>
   </dialog>
 
   <script>
+    // ===== Configuration partagée : à remplir une fois par l'administrateur (voir l'aide « ? » → Admin) =====
+    const CONFIG = { SCRIPT_URL: 'https://script.google.com/macros/s/AKfycbwZ4PpeysQ2MTAZ_MhudhzcoFsrWCHFMgfi0DBZBLLnxRbt29yMutKzU6b1HZcnm420/exec', APP_KEY: 'b0ToOOMyRgo7hfC3GSMKRulvw5mUCIDy0ddfdoAjmCwwT9dggiBY9qPSiOT6e8z5', SHARE_EMAIL: 'mathis.mouawad@gmail.com', GBOOKS_KEY: 'AIzaSyCvIPr5O8RhaM1rF9bII7QOrwMssuuHPQ4', TMDB_KEY: '1afe6b39a21cd9fe2ef15bfd5bbfa4dc' };
     const $ = s => document.querySelector(s), TABS = [['Pas commencé', 'À découvrir'], ['En cours', 'En cours'], ['Terminé', 'Découverts']];
     const TYPES = ['Livre', 'Film', 'Série TV', 'Jeu de société', 'Article'], COLORS = ['#3A4A7A', '#7A3A4F', '#2F6B57', '#8A5A2B', '#4B3F7A', '#2E5F78'];
     let items = [], tab = 'Pas commencé', tf = '', q = '', cur = null, note = 0, cfg = JSON.parse(localStorage.getItem('cfg') || '{}');
+    const srcOf = c => c.src || (c.url ? 'notion' : 'sheet');
+    const eff = () => { const s = srcOf(cfg); return { ...cfg, src: s, url: cfg.url || CONFIG.SCRIPT_URL, key: s === 'sheet' ? (CONFIG.APP_KEY || cfg.key) : cfg.key, gb: cfg.gb || CONFIG.GBOOKS_KEY, tmdb: cfg.tmdb || CONFIG.TMDB_KEY } };
+    const ready = () => { const e = eff(); return !!(e.url && e.key && (e.src !== 'sheet' || e.sheet)) };
     // --- stockage local (IndexedDB)
     const idb = new Promise((ok, ko) => { const r = indexedDB.open('mediatheque', 1); r.onupgradeneeded = () => r.result.createObjectStore('items', { keyPath: 'id' }); r.onsuccess = () => ok(r.result); r.onerror = ko });
     const tx = async (m, fn) => { const d = await idb; return new Promise((ok, ko) => { const t = d.transaction('items', m), s = t.objectStore('items'), r = fn(s); t.oncomplete = () => ok(r && r.result); t.onerror = ko }) };
@@ -804,6 +901,10 @@
     const toast = m => { const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('on'), 2200) };
     const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
     const stars = n => n ? '★'.repeat(n) + '☆'.repeat(5 - n) : '';
+    // Icônes Icons8 « puffy » (image distante ; si le nom n'existe pas, le symbole de secours s'affiche)
+    const IC = (n, s = 24, fb = '') => `<img class="ic" src="https://img.icons8.com/puffy/${s * 2}/${n}.png" width="${s}" height="${s}" alt="" data-fb="${esc(fb)}" onerror="this.replaceWith(Object.assign(document.createElement('span'),{textContent:this.dataset.fb,className:'ic-fb'}))">`;
+    const TABICON = { 'Pas commencé': 'bookmark', 'En cours': 'book', 'Terminé': 'checkmark', stats: 'bar-chart' };
+    const TYPEICON = { 'Livre': 'book', 'Film': 'film-reel', 'Série TV': 'tv-show', 'Jeu de société': 'dice', 'Article': 'news' };
     // --- affichage
     const SORTS = {
       recent: ['Ajoutés récemment', (a, b) => (b.added || b.updated || 0) - (a.added || a.updated || 0)],
@@ -842,19 +943,19 @@
     }
     function render() {
       const live = items.filter(i => !i.deleted), ql = q.toLowerCase(), st = tab === 'stats';
-      $('#tabs').innerHTML = TABS.map(([k, l]) => `<button role="tab" data-t="${k}" aria-selected="${k === tab}">${l}<small>${live.filter(i => i.statut === k).length}</small></button>`).join('') + `<button role="tab" data-t="stats" aria-selected="${st}">Stats</button>`;
+      $('#tabs').innerHTML = TABS.map(([k, l]) => `<button role="tab" data-t="${k}" aria-selected="${k === tab}">${IC(TABICON[k], 24)}<span>${l}<small>${live.filter(i => i.statut === k).length}</small></span></button>`).join('') + `<button role="tab" data-t="stats" aria-selected="${st}">${IC(TABICON.stats, 24)}<span>Stats</span></button>`;
       $('#types').innerHTML = [...new Set([...TYPES, ...live.map(i => i.type)])].map(t => `<option value="${esc(t)}">`).join('');
       ['#chips', '.sr', '#grid'].forEach(s => $(s).hidden = st); $('#stats').hidden = !st;
       if (st) { $('#empty').hidden = true; $('#stats').innerHTML = statsHTML(live) }
       else {
         const types = [...new Set([...TYPES, ...live.map(i => i.type)])].filter(t => live.some(i => i.type === t));
-        $('#chips').innerHTML = ['', ...types].map(t => `<button class="chip" data-f="${esc(t)}" aria-pressed="${t === tf}">${t || 'Tout'}</button>`).join('');
+        $('#chips').innerHTML = ['', ...types].map(t => `<button class="chip" data-f="${esc(t)}" aria-pressed="${t === tf}">${t && TYPEICON[t] ? IC(TYPEICON[t], 20) : ''}${t || 'Tout'}</button>`).join('');
         $('#sort').innerHTML = sortKeys(tab).map(k => `<option value="${k}"${k === sortOf(tab) ? ' selected' : ''}>${SORTS[k][0]}</option>`).join('');
         const list = live.filter(i => i.statut === tab && (!tf || i.type === tf) && (!ql || [i.nom, i.auteur, i.genre.join(' '), i.notes].join(' ').toLowerCase().includes(ql))).sort(SORTS[sortOf(tab)][1]);
         $('#grid').innerHTML = list.map(i => `<button class="card" data-id="${i.id}"><div class="cover" style="--c:${COLORS[[...i.nom].reduce((a, c) => a + c.charCodeAt(0), 0) % COLORS.length]}">${i.cover ? `<img src="${esc(i.cover)}" alt="" loading="lazy" onerror="this.remove()">` : ''}<span>${i.cover ? '' : esc(i.nom)}</span>${i.dirty ? '<i class="badge">●</i>' : ''}</div><h2>${esc(i.nom)}</h2><p>${esc(i.auteur || i.type)}</p><div class="st">${stars(i.note)}</div></button>`).join('');
         const e = $('#empty'); e.hidden = !!list.length; e.textContent = live.length ? 'Rien ici pour le moment.' : 'Ajoute ton premier média avec le bouton +, ou branche la synchronisation dans ⚙️.';
       }
-      const dn = live.filter(i => i.dirty).length; $('#status').textContent = !cfg.url ? 'Local' : !navigator.onLine ? 'Hors ligne' : dn ? `${dn} à envoyer` : 'Synchronisé';
+      const dn = live.filter(i => i.dirty).length; $('#status').textContent = !ready() ? 'Local' : !navigator.onLine ? 'Hors ligne' : dn ? `${dn} à envoyer` : 'Synchronisé';
     }
     // --- fiche
     function open_(i) {
@@ -883,13 +984,13 @@
       try {
         let r = [];
         if (t === 'Livre') {
-          const j = await (await fetch('https://www.googleapis.com/books/v1/volumes?maxResults=20&q=' + encodeURIComponent(n) + (cfg.gb ? '&key=' + encodeURIComponent(cfg.gb) : ''))).json();
+          const j = await (await fetch('https://www.googleapis.com/books/v1/volumes?maxResults=20&q=' + encodeURIComponent(n) + (eff().gb ? '&key=' + encodeURIComponent(eff().gb) : ''))).json();
           if (j.error) throw Error(j.error.status || 'api');
           r = (j.items || []).map(x => { const v = x.volumeInfo; return { nom: v.title, auteur: (v.authors || []).join(', '), cover: (v.imageLinks?.thumbnail || '').replace('http:', 'https:'), resume: v.description || '', genre: (v.categories || []).slice(0, 2), lien: v.infoLink || '', lang: v.language } }).sort((x, y) => (y.lang === 'fr') - (x.lang === 'fr')).slice(0, 6)
         }
-        else if ((t === 'Film' || t === 'Série TV') && cfg.tmdb) {
+        else if ((t === 'Film' || t === 'Série TV') && eff().tmdb) {
           const k = t === 'Film' ? 'movie' : 'tv';
-          const j = await (await fetch(`https://api.themoviedb.org/3/search/${k}?language=fr-FR&api_key=${cfg.tmdb}&query=${encodeURIComponent(n)}`)).json();
+          const j = await (await fetch(`https://api.themoviedb.org/3/search/${k}?language=fr-FR&api_key=${eff().tmdb}&query=${encodeURIComponent(n)}`)).json();
           r = (j.results || []).slice(0, 5).map(x => ({ nom: x.title || x.name, auteur: '', cover: x.poster_path ? 'https://image.tmdb.org/t/p/w342' + x.poster_path : '', resume: x.overview || '', genre: [], lien: `https://www.themoviedb.org/${k}/${x.id}` }))
         }
         else { box.textContent = t === 'Film' || t === 'Série TV' ? 'Ajoute une clé TMDB dans les réglages pour chercher les films et séries.' : 'Pas de recherche automatique pour ce type.'; return }
@@ -899,11 +1000,11 @@
     }
     // --- synchronisation Notion via le proxy
     // Apps Script : requête « simple » (corps texte, aucun en-tête perso) pour éviter le preflight CORS
-    const api = (action, data = {}) => fetch(cfg.url, { method: 'POST', body: JSON.stringify({ key: cfg.key, sheet: cfg.src === 'sheet' ? cfg.sheet : undefined, action, ...data }) }).then(async r => { const j = await r.json().catch(() => { throw Error('Réponse invalide : vérifie l’URL et l’accès « Tout le monde »') }); if (j && j.error) throw Error(j.error); return j });
+    const api = (action, data = {}) => fetch(eff().url, { method: 'POST', body: JSON.stringify({ key: eff().key, sheet: eff().src === 'sheet' ? eff().sheet : undefined, action, ...data }) }).then(async r => { const j = await r.json().catch(() => { throw Error('Réponse invalide : vérifie l’URL et l’accès « Tout le monde »') }); if (j && j.error) throw Error(j.error); return j });
     const pack = ({ nom, type, statut, note, auteur, termine, lien, cover, genre, notes, resume, added }) => ({ nom, type, statut, note, auteur, termine, lien, cover, genre, notes, resume, added });
     let syncing = false;
     async function sync(manual) {
-      if (!cfg.url || !cfg.key || (cfg.src === 'sheet' && !cfg.sheet) || syncing || !navigator.onLine) return; syncing = true; $('#status').textContent = 'Synchronisation…';
+      if (!ready() || syncing || !navigator.onLine) return; syncing = true; $('#status').textContent = 'Synchronisation…';
       try {
         for (const i of items.filter(x => x.dirty)) {
           if (i.deleted) { if (i.notionId) await api('delete', { id: i.notionId }); await rm(i.id); continue }
@@ -933,24 +1034,26 @@
         if (x.genre.length && !f.genre.value) f.genre.value = x.genre.join(', '); $('#found').innerHTML = ''
       }
     });
-    const formCfg = () => ({ src: $('#c-src').value, url: $('#c-url').value.trim(), key: $('#c-key').value, sheet: $('#c-sheet').value.trim(), tmdb: $('#c-tmdb').value.trim(), gb: $('#c-gb').value.trim() });
-    const sheetVis = () => { $('#c-sheet-l').hidden = $('#c-src').value !== 'sheet' };
-    const fillForm = c => { $('#c-src').value = c.src || 'notion'; $('#c-url').value = c.url || ''; $('#c-key').value = c.key || ''; $('#c-sheet').value = c.sheet || ''; $('#c-tmdb').value = c.tmdb || ''; $('#c-gb').value = c.gb || ''; sheetVis() };
+    const formCfg = () => ({ src: $('#c-src').value, url: $('#c-url').value.trim(), key: $('#c-key').value, sheet: $('#c-sheet').value.trim(), tmdb: $('#c-tmdb').value.trim(), gb: $('#c-gb').value.trim(), admin: !!cfg.admin });
+    const sheetVis = () => { const s = $('#c-src').value === 'sheet'; $('#c-sheet-l').hidden = !s; $('#share-hint').hidden = !s };
+    const admVis = () => { const a = !!cfg.admin || !CONFIG.SCRIPT_URL; $('#adm').hidden = !a; document.querySelectorAll('.adm-only').forEach(e => e.hidden = !a) };
+    const fillForm = c => { admVis(); $('#c-src').value = srcOf(c); $('#c-url').value = c.url || ''; $('#c-key').value = c.key || ''; $('#c-sheet').value = c.sheet || ''; $('#c-tmdb').value = c.tmdb || ''; $('#c-gb').value = c.gb || ''; sheetVis() };
     async function applyCfg(c) {
-      const key = c.src + '|' + (c.src === 'sheet' ? c.sheet : c.url), old = localStorage.getItem('srcKey');
+      const s = srcOf(c), key = s + '|' + (s === 'sheet' ? c.sheet : (c.url || CONFIG.SCRIPT_URL)), old = localStorage.getItem('srcKey');
       cfg = c; localStorage.setItem('cfg', JSON.stringify(cfg));
       if (old && old !== key && items.some(i => i.notionId)) {
         const push = confirm('La source de données a changé.\n\nOK : envoyer les médias de cet appareil vers la nouvelle source.\nAnnuler : repartir du contenu de la nouvelle source (les médias synchronisés de cet appareil seront remplacés).');
         for (const i of items.filter(x => x.notionId)) { if (push || i.dirty) { i.notionId = null; i.dirty = 1; await put(i) } else await rm(i.id) }
         await load();
       }
-      if (c.url) localStorage.setItem('srcKey', key);
+      if (ready()) localStorage.setItem('srcKey', key);
       render(); sync(1);
     }
+    let taps = 0; $('#cfg-title').onclick = () => { if (++taps >= 5) { taps = 0; cfg.admin = !cfg.admin; localStorage.setItem('cfg', JSON.stringify(cfg)); admVis(); toast(cfg.admin ? 'Mode administrateur activé' : 'Mode administrateur désactivé') } };
     $('#c-src').onchange = sheetVis; $('#help-btn').onclick = () => $('#help').showModal();
     $('#sort').onchange = e => { sorts[tab] = e.target.value; localStorage.setItem('sorts', JSON.stringify(sorts)); render() };
     $('#s-exp').onclick = async () => {
-      const f = new File([JSON.stringify({ app: 'mediatheque', v: 1, ...formCfg() }, null, 1)], 'mediatheque-reglages.json', { type: 'application/json' });
+      const f = new File([JSON.stringify({ app: 'biblibibi', v: 1, ...formCfg() }, null, 1)], 'biblibibi-reglages.json', { type: 'application/json' });
       if (navigator.canShare && navigator.canShare({ files: [f] })) { try { await navigator.share({ files: [f] }); return } catch (e) { if (e.name === 'AbortError') return } }
       const a = document.createElement('a'); a.href = URL.createObjectURL(f); a.download = f.name; a.click(); toast('Exporté : le fichier contient tes clés, garde-le privé');
     };
@@ -958,8 +1061,8 @@
     $('#s-file').onchange = async e => {
       const file = e.target.files[0]; e.target.value = ''; if (!file) return;
       try {
-        const c = JSON.parse(await file.text()); if (c.app !== 'mediatheque') throw 0;
-        fillForm(c); applyCfg(formCfg()); toast('Réglages importés')
+        const c = JSON.parse(await file.text()); if (!['mediatheque', 'biblibibi'].includes(c.app)) throw 0;
+        cfg = { ...cfg, admin: !!c.admin }; fillForm(c); applyCfg(formCfg()); toast('Réglages importés')
       } catch { toast('Fichier de réglages invalide') }
     };
     $('#q').oninput = e => { q = e.target.value; render() }; $('#add').onclick = () => open_(); $('#f').onsubmit = save; $('#del').onclick = del;
@@ -967,10 +1070,12 @@
     $('#gear').onclick = () => { fillForm(cfg); $('#cfg').showModal() };
     $('#cfg form').onsubmit = () => { applyCfg(formCfg()) };
     $('#c-sync').onclick = () => { applyCfg(formCfg()); $('#cfg').close() };
-    $('#c-exp').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(items.filter(i => !i.deleted).map(pack), null, 1)], { type: 'application/json' })); a.download = 'mediatheque.json'; a.click() };
+    $('#c-exp').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([JSON.stringify(items.filter(i => !i.deleted).map(pack), null, 1)], { type: 'application/json' })); a.download = 'biblibibi.json'; a.click() };
     addEventListener('online', () => sync()); addEventListener('offline', render);
     (async () => {
-      await load();
+      document.querySelectorAll('[data-ic]').forEach(el => el.innerHTML = IC(el.dataset.ic, +el.dataset.s || 24, el.dataset.fb || ''));
+      if (CONFIG.SHARE_EMAIL) document.querySelectorAll('.sh-mail').forEach(e => e.textContent = CONFIG.SHARE_EMAIL);
+      admVis(); await load();
       render(); sync();
       if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js');
     })();
